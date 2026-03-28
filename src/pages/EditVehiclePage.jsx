@@ -25,29 +25,83 @@ export default function EditVehiclePage() {
     if (data) {
       const v = data?.data ?? data;
       methods.reset({
-        manufacture: v.manufacture ?? "", model: v.model ?? "", year: v.year,
-        vehicleType: v.vehicleType ?? "", fuelType: v.fuelType ?? "", bodyType: v.bodyType ?? "",
-        color: v.color ?? "", engineCapacity: v.engineCapacity, seatingCapacity: v.seatingCapacity,
-        odometerReading: v.odometerReading ?? 0, purpose: v.purpose ?? "", status: v.status ?? "",
-        ownerName: v.ownerName ?? "", ownerType: v.ownerType ?? "", nationalId: v.nationalId ?? "",
-        mobileNumber: v.mobileNumber ?? "", email: v.email ?? "", address: v.address ?? "",
-        companyRegNumber: v.companyRegNumber ?? "", passportNumber: v.passportNumber ?? "",
-        plateNumber: v.plateNumber ?? "", plateType: v.plateType ?? "",
+        manufacture:      v.manufacture ?? "",
+        model:            v.model ?? "",
+        year:             v.year,
+        vehicleType:      v.vehicleType ?? "",
+        fuelType:         v.fuelType ?? "",
+        bodyType:         v.bodyType ?? "",
+        color:            v.color ?? "",
+        engineCapacity:   v.engineCapacity,
+        seatingCapacity:  v.seatingCapacity,
+        odometerReading:  v.odometerReading ?? 0,
+        purpose:          v.vehiclePurpose ?? "", // map back from API
+        status:           v.vehicleStatus  ?? "", // map back from API
+        ownerName:        v.ownerName ?? "",
+        ownerType:        v.ownerType ?? "",
+        nationalId:       v.nationalId ?? "",
+        mobileNumber:     v.mobile ?? "",          // map back from API
+        email:            v.email ?? "",
+        address:          v.address ?? "",
+        companyRegNumber: v.companyRegNumber ?? "",
+        passportNumber:   v.passportNumber ?? "",
+        plateNumber:      v.plateNumber ?? "",
+        plateType:        v.plateType ?? "",
         registrationDate: v.registrationDate?.slice(0,16) ?? "",
-        expiryDate: v.expiryDate?.slice(0,16) ?? "",
-        registrationStatus: v.registrationStatus ?? "", customsRef: v.customsRef ?? "",
-        proofOfOwnership: v.proofOfOwnership ?? "", roadworthyCert: v.roadworthyCert ?? "",
-        state: v.state ?? "", policyNumber: v.policyNumber ?? "", companyName: v.companyName ?? "",
-        insuranceType: v.insuranceType ?? "",
+        expiryDate:       v.expiryDate?.slice(0,16) ?? "",
+        registrationStatus: v.registrationStatus ?? "",
+        customsRef:       v.customsRef ?? "",
+        proofOfOwnership: v.proofOfOwnership ?? "",
+        roadworthyCert:   v.roadworthyCert ?? "",
+        state:            v.state ?? "",
+        policyNumber:     v.policyNumber ?? "",
+        companyName:      v.insuranceCompany ?? "", // map back from API
+        insuranceType:    v.insuranceType ?? "",
         insuranceExpiryDate: v.insuranceExpiryDate?.slice(0,16) ?? "",
-        insuranceStatus: v.insuranceStatus ?? "",
+        insuranceStatus:  v.insuranceStatus ?? "",
       });
     }
   }, [data, methods]);
 
   const onSubmit = async (formData) => {
+    const payload = {
+      manufacture:     formData.manufacture.trim(),
+      model:           formData.model.trim(),
+      year:            Number(formData.year),
+      vehicleType:     formData.vehicleType,
+      bodyType:        formData.bodyType.trim(),
+      color:           formData.color.trim(),
+      fuelType:        formData.fuelType,
+      engineCapacity:  Number(formData.engineCapacity),
+      odometerReading: Number(formData.odometerReading),
+      seatingCapacity: Number(formData.seatingCapacity),
+      vehiclePurpose:  formData.purpose,
+      vehicleStatus:   formData.status,
+      ownerName:       formData.ownerName.trim(),
+      ownerType:       formData.ownerType,
+      nationalId:      formData.nationalId.trim(),
+      passportNumber:  formData.passportNumber?.trim() || "",
+      companyRegNumber:formData.companyRegNumber?.trim() || "",
+      address:         formData.address.trim(),
+      mobile:          formData.mobileNumber.trim(),
+      email:           formData.email.trim(),
+      plateNumber:     formData.plateNumber.trim(),
+      plateType:       formData.plateType,
+      registrationStatus: formData.registrationStatus,
+      registrationDate:   new Date(formData.registrationDate).toISOString(),
+      expiryDate:         new Date(formData.expiryDate).toISOString(),
+      state:           formData.state.trim(),
+      customsRef:      formData.customsRef.trim(),
+      roadworthyCert:  formData.roadworthyCert.trim(),
+      proofOfOwnership:formData.proofOfOwnership.trim(),
+      policyNumber:    formData.policyNumber.trim(),
+      insuranceCompany:formData.companyName.trim(),
+      insuranceType:   formData.insuranceType.trim(),
+      insuranceStatus: formData.insuranceStatus,
+      insuranceExpiryDate: new Date(formData.insuranceExpiryDate).toISOString(),
+    };
     try {
-      await updateMutation.mutateAsync(formData);
+      await updateMutation.mutateAsync(payload);
       navigate(`/vehicle/${id}`);
     } catch { /* handled in hook */ }
   };

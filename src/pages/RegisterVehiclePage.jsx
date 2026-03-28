@@ -48,54 +48,53 @@ export default function RegisterVehiclePage() {
     if (valid) setStep(s => s + 1);
   };
 
-  const onSubmit = async (stepData) => {
-    // Merge all form values (not just current step)
+  const buildPayload = (all) => ({
+    // ── Vehicle Info ──────────────────────────────
+    manufacture:     all.manufacture.trim(),
+    model:           all.model.trim(),
+    year:            Number(all.year),
+    vehicleType:     all.vehicleType,
+    bodyType:        all.bodyType.trim(),
+    color:           all.color.trim(),
+    fuelType:        all.fuelType,
+    engineCapacity:  Number(all.engineCapacity),
+    odometerReading: Number(all.odometerReading),
+    seatingCapacity: Number(all.seatingCapacity),
+    vehiclePurpose:  all.purpose,          // API field name
+    vehicleStatus:   all.status,           // API field name
+
+    // ── Owner Info ────────────────────────────────
+    ownerName:        all.ownerName.trim(),
+    ownerType:        all.ownerType,
+    nationalId:       all.nationalId.trim(),
+    passportNumber:   all.passportNumber?.trim() || "",
+    companyRegNumber: all.companyRegNumber?.trim() || "",
+    address:          all.address.trim(),
+    mobile:           all.mobileNumber.trim(), // API field name
+    email:            all.email.trim(),
+
+    // ── Registration ──────────────────────────────
+    plateNumber:        all.plateNumber.trim(),
+    plateType:          all.plateType,
+    registrationStatus: all.registrationStatus,
+    registrationDate:   new Date(all.registrationDate).toISOString(),
+    expiryDate:         new Date(all.expiryDate).toISOString(),
+    state:              all.state.trim(),
+    customsRef:         all.customsRef.trim(),
+    roadworthyCert:     all.roadworthyCert.trim(),
+    proofOfOwnership:   all.proofOfOwnership.trim(),
+
+    // ── Insurance ─────────────────────────────────
+    policyNumber:        all.policyNumber.trim(),
+    insuranceCompany:    all.companyName.trim(), // API field name
+    insuranceType:       all.insuranceType.trim(),
+    insuranceStatus:     all.insuranceStatus,
+    insuranceExpiryDate: new Date(all.insuranceExpiryDate).toISOString(),
+  });
+
+  const onSubmit = async () => {
     const all = getValues();
-
-    const payload = {
-      // Vehicle Info
-      manufacture:     all.manufacture.trim(),
-      model:           all.model.trim(),
-      year:            Number(all.year),
-      vehicleType:     all.vehicleType,
-      fuelType:        all.fuelType,
-      bodyType:        all.bodyType.trim(),
-      color:           all.color.trim(),
-      engineCapacity:  Number(all.engineCapacity),
-      seatingCapacity: Number(all.seatingCapacity),
-      odometerReading: Number(all.odometerReading),
-      purpose:         all.purpose,
-      status:          all.status,
-
-      // Owner Info
-      ownerName:        all.ownerName.trim(),
-      ownerType:        all.ownerType,
-      nationalId:       all.nationalId.trim(),
-      mobileNumber:     all.mobileNumber.trim(),
-      email:            all.email.trim(),
-      address:          all.address.trim(),
-      ...(all.companyRegNumber?.trim() && { companyRegNumber: all.companyRegNumber.trim() }),
-      ...(all.passportNumber?.trim()   && { passportNumber:   all.passportNumber.trim()   }),
-
-      // Registration
-      plateNumber:        all.plateNumber.trim(),
-      plateType:          all.plateType,
-      registrationDate:   new Date(all.registrationDate).toISOString(),
-      expiryDate:         new Date(all.expiryDate).toISOString(),
-      registrationStatus: all.registrationStatus,
-      customsRef:         all.customsRef.trim(),
-      proofOfOwnership:   all.proofOfOwnership.trim(),
-      roadworthyCert:     all.roadworthyCert.trim(),
-      state:              all.state.trim(),
-
-      // Insurance
-      policyNumber:        all.policyNumber.trim(),
-      companyName:         all.companyName.trim(),
-      insuranceType:       all.insuranceType.trim(),
-      insuranceExpiryDate: new Date(all.insuranceExpiryDate).toISOString(),
-      insuranceStatus:     all.insuranceStatus,
-    };
-
+    const payload = buildPayload(all);
     try {
       await createMutation.mutateAsync(payload);
       setSubmitted(true);
@@ -108,7 +107,7 @@ export default function RegisterVehiclePage() {
         <div className="flex flex-col items-center text-center gap-4 py-16 bg-[#181c26] border border-[#2a3045] rounded-2xl">
           <div className="text-emerald-400"><CheckCircle2 size={52}/></div>
           <h2 className="text-2xl font-bold text-white">Vehicle Registered!</h2>
-          <p className="text-slate-400 max-w-sm text-sm">The vehicle has been successfully added to the Rwanda registry.</p>
+          <p className="text-slate-400 max-w-sm text-sm">Successfully added to the Rwanda registry.</p>
           <div className="flex gap-3 mt-2">
             <button onClick={() => navigate("/dashboard")}
               className="px-5 py-2.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold cursor-pointer">
@@ -156,7 +155,6 @@ export default function RegisterVehiclePage() {
         ))}
       </div>
 
-      {/* Form */}
       <FormProvider {...methods}>
         <form onSubmit={handleSubmit(onSubmit)} noValidate>
           <div className="bg-[#181c26] border border-[#2a3045] rounded-2xl p-6 md:p-8">

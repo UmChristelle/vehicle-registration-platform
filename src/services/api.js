@@ -1,9 +1,8 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "https://cm-vehicle-registration.onrender.com",
+  baseURL: "https://student-management-system-backend.up.railway.app/api/vehicle-service",
   headers: { "Content-Type": "application/json" },
-  withCredentials: false,
 });
 
 api.interceptors.response.use(
