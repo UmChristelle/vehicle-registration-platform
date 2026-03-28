@@ -19,19 +19,21 @@ const STEPS = [
 const STEP_COMPONENTS = [Step1VehicleInfo, Step2OwnerInfo, Step3RegInsurance];
 
 const DEFAULT_VALUES = {
-  manufacture:"",model:"",year:undefined,vehicleType:"",fuelType:"",bodyType:"",color:"",
-  engineCapacity:undefined,seatingCapacity:undefined,odometerReading:undefined,purpose:"",status:"",
-  ownerName:"",ownerType:"",nationalId:"",mobileNumber:"",email:"",address:"",companyRegNumber:"",passportNumber:"",
-  plateNumber:"",plateType:"",registrationDate:"",expiryDate:"",registrationStatus:"",customsRef:"",
-  proofOfOwnership:"",roadworthyCert:"",state:"",policyNumber:"",companyName:"",insuranceType:"",
-  insuranceExpiryDate:"",insuranceStatus:"",
+  manufacture:"", model:"", year:undefined, vehicleType:"", fuelType:"", bodyType:"",
+  color:"", engineCapacity:undefined, seatingCapacity:undefined, odometerReading:undefined,
+  purpose:"", status:"",
+  ownerName:"", ownerType:"", nationalId:"", mobileNumber:"", email:"", address:"",
+  companyRegNumber:"", passportNumber:"",
+  plateNumber:"", plateType:"", registrationDate:"", expiryDate:"", registrationStatus:"",
+  customsRef:"", proofOfOwnership:"", roadworthyCert:"", state:"",
+  policyNumber:"", companyName:"", insuranceType:"", insuranceExpiryDate:"", insuranceStatus:"",
 };
 
 export default function RegisterVehiclePage() {
-  const [step, setStep]         = useState(0);
+  const [step, setStep]           = useState(0);
   const [submitted, setSubmitted] = useState(false);
-  const navigate                = useNavigate();
-  const createMutation          = useCreateVehicle();
+  const navigate                  = useNavigate();
+  const createMutation            = useCreateVehicle();
 
   const methods = useForm({
     resolver: zodResolver(STEPS[step].schema),
@@ -39,16 +41,63 @@ export default function RegisterVehiclePage() {
     defaultValues: DEFAULT_VALUES,
   });
 
-  const { handleSubmit, trigger } = methods;
+  const { handleSubmit, trigger, getValues } = methods;
 
   const goNext = async () => {
     const valid = await trigger();
     if (valid) setStep(s => s + 1);
   };
 
-  const onSubmit = async (data) => {
+  const onSubmit = async (stepData) => {
+    // Merge all form values (not just current step)
+    const all = getValues();
+
+    const payload = {
+      // Vehicle Info
+      manufacture:     all.manufacture.trim(),
+      model:           all.model.trim(),
+      year:            Number(all.year),
+      vehicleType:     all.vehicleType,
+      fuelType:        all.fuelType,
+      bodyType:        all.bodyType.trim(),
+      color:           all.color.trim(),
+      engineCapacity:  Number(all.engineCapacity),
+      seatingCapacity: Number(all.seatingCapacity),
+      odometerReading: Number(all.odometerReading),
+      purpose:         all.purpose,
+      status:          all.status,
+
+      // Owner Info
+      ownerName:        all.ownerName.trim(),
+      ownerType:        all.ownerType,
+      nationalId:       all.nationalId.trim(),
+      mobileNumber:     all.mobileNumber.trim(),
+      email:            all.email.trim(),
+      address:          all.address.trim(),
+      ...(all.companyRegNumber?.trim() && { companyRegNumber: all.companyRegNumber.trim() }),
+      ...(all.passportNumber?.trim()   && { passportNumber:   all.passportNumber.trim()   }),
+
+      // Registration
+      plateNumber:        all.plateNumber.trim(),
+      plateType:          all.plateType,
+      registrationDate:   new Date(all.registrationDate).toISOString(),
+      expiryDate:         new Date(all.expiryDate).toISOString(),
+      registrationStatus: all.registrationStatus,
+      customsRef:         all.customsRef.trim(),
+      proofOfOwnership:   all.proofOfOwnership.trim(),
+      roadworthyCert:     all.roadworthyCert.trim(),
+      state:              all.state.trim(),
+
+      // Insurance
+      policyNumber:        all.policyNumber.trim(),
+      companyName:         all.companyName.trim(),
+      insuranceType:       all.insuranceType.trim(),
+      insuranceExpiryDate: new Date(all.insuranceExpiryDate).toISOString(),
+      insuranceStatus:     all.insuranceStatus,
+    };
+
     try {
-      await createMutation.mutateAsync(data);
+      await createMutation.mutateAsync(payload);
       setSubmitted(true);
     } catch { /* handled in hook */ }
   };
@@ -79,21 +128,20 @@ export default function RegisterVehiclePage() {
 
   return (
     <div className="p-6 md:p-8 max-w-225">
-      {/* Header */}
       <div className="mb-7 pb-6 border-b border-[#2a3045]">
         <h1 className="text-2xl font-bold text-white">Register New Vehicle</h1>
         <p className="text-sm text-slate-500 mt-1">Complete all three steps to register a vehicle in the system.</p>
       </div>
 
       {/* Stepper */}
-      <div className="flex items-center gap-0 bg-[#181c26] border border-[#2a3045] rounded-xl px-6 py-4 mb-6">
+      <div className="flex items-center bg-[#181c26] border border-[#2a3045] rounded-xl px-6 py-4 mb-6">
         {STEPS.map((s, i) => (
           <div key={s.label} className="flex items-center flex-1">
             <div className="flex items-center gap-2.5 shrink-0">
               <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold font-mono border transition-all
-                ${i < step  ? "bg-emerald-500/10 border-emerald-500/40 text-emerald-400"
+                ${i < step   ? "bg-emerald-500/10 border-emerald-500/40 text-emerald-400"
                 : i === step ? "bg-blue-500/10 border-blue-500/40 text-blue-400"
-                :              "bg-[#1f2433] border-[#2a3045] text-slate-600"}`}>
+                :               "bg-[#1f2433] border-[#2a3045] text-slate-600"}`}>
                 {i < step ? <CheckCircle2 size={14}/> : i + 1}
               </div>
               <span className={`text-xs font-semibold whitespace-nowrap
@@ -115,10 +163,9 @@ export default function RegisterVehiclePage() {
             <StepComponent/>
             {step === 2 && <ErrorList error={createMutation.error}/>}
 
-            {/* Navigation */}
             <div className="flex items-center mt-8 pt-6 border-t border-[#2a3045]">
               {step > 0 && (
-                <button type="button" onClick={() => setStep(s => s-1)}
+                <button type="button" onClick={() => setStep(s => s - 1)}
                   className="flex items-center gap-2 px-4 py-2.5 rounded-lg bg-[#1f2433] border border-[#2a3045] text-slate-300 text-sm font-semibold hover:bg-[#252b3b] cursor-pointer">
                   <ChevronLeft size={16}/> Back
                 </button>
