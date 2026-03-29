@@ -7,16 +7,17 @@ import Step1VehicleInfo from "../components/forms/Step1VehicleInfo";
 import Step2OwnerInfo from "../components/forms/Step2OwnerInfo";
 import Step3RegInsurance from "../components/forms/Step3RegInsurance";
 import ErrorList from "../components/ui/ErrorList";
-import { vehicleInfoSchema, ownerInfoSchema, regInsuranceSchema } from "../utils/validationSchemas";
+import { fullVehicleSchema } from "../utils/validationSchemas";
 import { CheckCircle2, ChevronLeft, ChevronRight, Send } from "lucide-react";
 
-const STEPS = [
-  { label: "Vehicle Info",    schema: vehicleInfoSchema  },
-  { label: "Owner Info",      schema: ownerInfoSchema    },
-  { label: "Reg & Insurance", schema: regInsuranceSchema },
-];
-
+const STEP_LABELS = ["Vehicle Info", "Owner Info", "Reg & Insurance"];
 const STEP_COMPONENTS = [Step1VehicleInfo, Step2OwnerInfo, Step3RegInsurance];
+
+const STEP_FIELDS = [
+  ["manufacture","model","year","vehicleType","fuelType","bodyType","color","engineCapacity","seatingCapacity","odometerReading","purpose","status"],
+  ["ownerName","ownerType","nationalId","mobileNumber","email","address","companyRegNumber","passportNumber"],
+  ["plateNumber","plateType","registrationDate","expiryDate","registrationStatus","customsRef","proofOfOwnership","roadworthyCert","state","policyNumber","companyName","insuranceType","insuranceExpiryDate","insuranceStatus"],
+];
 
 const DEFAULT_VALUES = {
   manufacture:"", model:"", year:undefined, vehicleType:"", fuelType:"", bodyType:"",
@@ -36,76 +37,60 @@ export default function RegisterVehiclePage() {
   const createMutation            = useCreateVehicle();
 
   const methods = useForm({
-    resolver: zodResolver(STEPS[step].schema),
+    resolver: zodResolver(fullVehicleSchema),
     mode: "onChange",
     defaultValues: DEFAULT_VALUES,
   });
 
-  const { handleSubmit, trigger, getValues } = methods;
+  const { handleSubmit, trigger, reset } = methods;
 
   const goNext = async () => {
-    const valid = await trigger();
+    const valid = await trigger(STEP_FIELDS[step]);
     if (valid) setStep(s => s + 1);
   };
 
-  const buildPayload = (all) => {
+  const onSubmit = async (data) => {
     const payload = {
-      // Vehicle Info
-      manufacture:     all.manufacture.trim(),
-      model:           all.model.trim(),
-      year:            Number(all.year),
-      vehicleType:     all.vehicleType,
-      bodyType:        all.bodyType.trim(),
-      color:           all.color.trim(),
-      fuelType:        all.fuelType,
-      engineCapacity:  Number(all.engineCapacity),
-      odometerReading: Number(all.odometerReading),
-      seatingCapacity: Number(all.seatingCapacity),
-      vehiclePurpose:  all.purpose,
-      vehicleStatus:   all.status,
-
-      // Owner Info
-      ownerName:  all.ownerName.trim(),
-      ownerType:  all.ownerType,
-      nationalId: all.nationalId.trim(),
-      address:    all.address.trim(),
-      mobile:     all.mobileNumber.trim(),
-      email:      all.email.trim(),
-
-      // only send if not empty
-      ...(all.passportNumber?.trim()   && { passportNumber:   all.passportNumber.trim()   }),
-      ...(all.companyRegNumber?.trim() && { companyRegNumber: all.companyRegNumber.trim() }),
-
-      // Registration
-      plateNumber:        all.plateNumber.trim(),
-      plateType:          all.plateType,
-      registrationStatus: all.registrationStatus,
-      registrationDate:   new Date(all.registrationDate).toISOString(),
-      expiryDate:         new Date(all.expiryDate).toISOString(),
-      state:              all.state.trim(),
-      customsRef:         all.customsRef.trim(),
-      roadworthyCert:     all.roadworthyCert.trim(),
-      proofOfOwnership:   all.proofOfOwnership.trim(),
-
-      // Insurance — companyName is the exact field the API expects
-      policyNumber:        all.policyNumber.trim(),
-      companyName:         all.companyName.trim(),
-      insuranceType:       all.insuranceType.trim(),
-      insuranceStatus:     all.insuranceStatus,
-      insuranceExpiryDate: new Date(all.insuranceExpiryDate).toISOString(),
+      manufacture:         data.manufacture.trim(),
+      model:               data.model.trim(),
+      year:                Number(data.year),
+      vehicleType:         data.vehicleType,
+      bodyType:            data.bodyType.trim(),
+      color:               data.color.trim(),
+      fuelType:            data.fuelType,
+      engineCapacity:      Number(data.engineCapacity),
+      odometerReading:     Number(data.odometerReading),
+      seatingCapacity:     Number(data.seatingCapacity),
+      vehiclePurpose:      data.purpose,
+      vehicleStatus:       data.status,
+      ownerName:           data.ownerName.trim(),
+      ownerType:           data.ownerType,
+      nationalId:          data.nationalId.trim(),
+      address:             data.address.trim(),
+      mobile:              data.mobileNumber.trim(),
+      email:               data.email.trim(),
+      ...(data.passportNumber?.trim()   && { passportNumber:   data.passportNumber.trim()   }),
+      ...(data.companyRegNumber?.trim() && { companyRegNumber: data.companyRegNumber.trim() }),
+      plateNumber:         data.plateNumber.trim(),
+      plateType:           data.plateType,
+      registrationStatus:  data.registrationStatus,
+      registrationDate:    new Date(data.registrationDate).toISOString(),
+      expiryDate:          new Date(data.expiryDate).toISOString(),
+      state:               data.state.trim(),
+      customsRef:          data.customsRef.trim(),
+      roadworthyCert:      data.roadworthyCert.trim(),
+      proofOfOwnership:    data.proofOfOwnership.trim(),
+      policyNumber:        data.policyNumber.trim(),
+      companyName:         data.companyName.trim(),
+      insuranceType:       data.insuranceType.trim(),
+      insuranceStatus:     data.insuranceStatus,
+      insuranceExpiryDate: new Date(data.insuranceExpiryDate).toISOString(),
     };
 
-    console.log("PAYLOAD BEING SENT:", JSON.stringify(payload, null, 2));
-    return payload;
-  };
-
-  const onSubmit = async () => {
-    const all = getValues();
-    const payload = buildPayload(all);
     try {
       await createMutation.mutateAsync(payload);
       setSubmitted(true);
-    } catch { /* handled in hook */ }
+    } catch {}
   };
 
   if (submitted) {
@@ -120,7 +105,7 @@ export default function RegisterVehiclePage() {
               className="px-5 py-2.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold cursor-pointer">
               Go to Dashboard
             </button>
-            <button onClick={() => { setSubmitted(false); setStep(0); methods.reset(DEFAULT_VALUES); }}
+            <button onClick={() => { setSubmitted(false); setStep(0); reset(DEFAULT_VALUES); }}
               className="px-5 py-2.5 rounded-lg bg-[#1f2433] border border-[#2a3045] text-slate-300 text-sm font-semibold hover:bg-[#252b3b] cursor-pointer">
               Register Another
             </button>
@@ -139,10 +124,9 @@ export default function RegisterVehiclePage() {
         <p className="text-sm text-slate-500 mt-1">Complete all three steps to register a vehicle.</p>
       </div>
 
-      {/* Stepper */}
       <div className="flex items-center bg-[#181c26] border border-[#2a3045] rounded-xl px-6 py-4 mb-6">
-        {STEPS.map((s, i) => (
-          <div key={s.label} className="flex items-center flex-1">
+        {STEP_LABELS.map((label, i) => (
+          <div key={label} className="flex items-center flex-1">
             <div className="flex items-center gap-2.5 shrink-0">
               <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold font-mono border transition-all
                 ${i < step   ? "bg-emerald-500/10 border-emerald-500/40 text-emerald-400"
@@ -152,10 +136,10 @@ export default function RegisterVehiclePage() {
               </div>
               <span className={`text-xs font-semibold whitespace-nowrap
                 ${i < step ? "text-emerald-400" : i === step ? "text-white" : "text-slate-600"}`}>
-                {s.label}
+                {label}
               </span>
             </div>
-            {i < STEPS.length - 1 && (
+            {i < STEP_LABELS.length - 1 && (
               <div className={`flex-1 h-px mx-3 ${i < step ? "bg-emerald-500/30" : "bg-[#2a3045]"}`}/>
             )}
           </div>
@@ -176,7 +160,7 @@ export default function RegisterVehiclePage() {
                 </button>
               )}
               <div className="ml-auto">
-                {step < STEPS.length - 1 ? (
+                {step < 2 ? (
                   <button type="button" onClick={goNext}
                     className="flex items-center gap-2 px-5 py-2.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold cursor-pointer">
                     Next <ChevronRight size={16}/>
