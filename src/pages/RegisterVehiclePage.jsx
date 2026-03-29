@@ -48,49 +48,56 @@ export default function RegisterVehiclePage() {
     if (valid) setStep(s => s + 1);
   };
 
-  const buildPayload = (all) => ({
-    // ── Vehicle Info ──────────────────────────────
-    manufacture:     all.manufacture.trim(),
-    model:           all.model.trim(),
-    year:            Number(all.year),
-    vehicleType:     all.vehicleType,
-    bodyType:        all.bodyType.trim(),
-    color:           all.color.trim(),
-    fuelType:        all.fuelType,
-    engineCapacity:  Number(all.engineCapacity),
-    odometerReading: Number(all.odometerReading),
-    seatingCapacity: Number(all.seatingCapacity),
-    vehiclePurpose:  all.purpose,          // API field name
-    vehicleStatus:   all.status,           // API field name
+  const buildPayload = (all) => {
+    const payload = {
+      // Vehicle Info
+      manufacture:     all.manufacture.trim(),
+      model:           all.model.trim(),
+      year:            Number(all.year),
+      vehicleType:     all.vehicleType,
+      bodyType:        all.bodyType.trim(),
+      color:           all.color.trim(),
+      fuelType:        all.fuelType,
+      engineCapacity:  Number(all.engineCapacity),
+      odometerReading: Number(all.odometerReading),
+      seatingCapacity: Number(all.seatingCapacity),
+      vehiclePurpose:  all.purpose,
+      vehicleStatus:   all.status,
 
-    // ── Owner Info ────────────────────────────────
-    ownerName:        all.ownerName.trim(),
-    ownerType:        all.ownerType,
-    nationalId:       all.nationalId.trim(),
-    passportNumber:   all.passportNumber?.trim() || "",
-    companyRegNumber: all.companyRegNumber?.trim() || "",
-    address:          all.address.trim(),
-    mobile:           all.mobileNumber.trim(), // API field name
-    email:            all.email.trim(),
+      // Owner Info
+      ownerName:  all.ownerName.trim(),
+      ownerType:  all.ownerType,
+      nationalId: all.nationalId.trim(),
+      address:    all.address.trim(),
+      mobile:     all.mobileNumber.trim(),
+      email:      all.email.trim(),
 
-    // ── Registration ──────────────────────────────
-    plateNumber:        all.plateNumber.trim(),
-    plateType:          all.plateType,
-    registrationStatus: all.registrationStatus,
-    registrationDate:   new Date(all.registrationDate).toISOString(),
-    expiryDate:         new Date(all.expiryDate).toISOString(),
-    state:              all.state.trim(),
-    customsRef:         all.customsRef.trim(),
-    roadworthyCert:     all.roadworthyCert.trim(),
-    proofOfOwnership:   all.proofOfOwnership.trim(),
+      // only send if not empty
+      ...(all.passportNumber?.trim()   && { passportNumber:   all.passportNumber.trim()   }),
+      ...(all.companyRegNumber?.trim() && { companyRegNumber: all.companyRegNumber.trim() }),
 
-    // ── Insurance ─────────────────────────────────
-    policyNumber:        all.policyNumber.trim(),
-    insuranceCompany:    all.companyName.trim(), // API field name
-    insuranceType:       all.insuranceType.trim(),
-    insuranceStatus:     all.insuranceStatus,
-    insuranceExpiryDate: new Date(all.insuranceExpiryDate).toISOString(),
-  });
+      // Registration
+      plateNumber:        all.plateNumber.trim(),
+      plateType:          all.plateType,
+      registrationStatus: all.registrationStatus,
+      registrationDate:   new Date(all.registrationDate).toISOString(),
+      expiryDate:         new Date(all.expiryDate).toISOString(),
+      state:              all.state.trim(),
+      customsRef:         all.customsRef.trim(),
+      roadworthyCert:     all.roadworthyCert.trim(),
+      proofOfOwnership:   all.proofOfOwnership.trim(),
+
+      // Insurance — companyName is the exact field the API expects
+      policyNumber:        all.policyNumber.trim(),
+      companyName:         all.companyName.trim(),
+      insuranceType:       all.insuranceType.trim(),
+      insuranceStatus:     all.insuranceStatus,
+      insuranceExpiryDate: new Date(all.insuranceExpiryDate).toISOString(),
+    };
+
+    console.log("PAYLOAD BEING SENT:", JSON.stringify(payload, null, 2));
+    return payload;
+  };
 
   const onSubmit = async () => {
     const all = getValues();
@@ -129,7 +136,7 @@ export default function RegisterVehiclePage() {
     <div className="p-6 md:p-8 max-w-225">
       <div className="mb-7 pb-6 border-b border-[#2a3045]">
         <h1 className="text-2xl font-bold text-white">Register New Vehicle</h1>
-        <p className="text-sm text-slate-500 mt-1">Complete all three steps to register a vehicle in the system.</p>
+        <p className="text-sm text-slate-500 mt-1">Complete all three steps to register a vehicle.</p>
       </div>
 
       {/* Stepper */}

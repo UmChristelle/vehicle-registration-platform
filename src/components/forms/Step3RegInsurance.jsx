@@ -33,8 +33,13 @@ export default function Step3RegInsurance() {
 
       <SectionTitle>Registration Details</SectionTitle>
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5">
+
         <FormField label="Plate Number" error={errors.plateNumber?.message} required>
-          <input className={inputCls(errors.plateNumber)} placeholder="e.g. RAB 123 A" {...register("plateNumber")} />
+          <input
+            className={inputCls(errors.plateNumber)}
+            placeholder="e.g. RAB 123 A"
+            {...register("plateNumber")}
+          />
         </FormField>
 
         <FormField label="Plate Type" error={errors.plateType?.message} required>
@@ -45,11 +50,19 @@ export default function Step3RegInsurance() {
         </FormField>
 
         <FormField label="Registration Date" error={errors.registrationDate?.message} required>
-          <input type="datetime-local" className={inputCls(errors.registrationDate)} {...register("registrationDate")} />
+          <input
+            type="datetime-local"
+            className={inputCls(errors.registrationDate)}
+            {...register("registrationDate")}
+          />
         </FormField>
 
         <FormField label="Expiry Date" error={errors.expiryDate?.message} required>
-          <input type="datetime-local" className={inputCls(errors.expiryDate)} {...register("expiryDate")} />
+          <input
+            type="datetime-local"
+            className={inputCls(errors.expiryDate)}
+            {...register("expiryDate")}
+          />
         </FormField>
 
         <FormField label="Registration Status" error={errors.registrationStatus?.message} required>
@@ -60,38 +73,72 @@ export default function Step3RegInsurance() {
         </FormField>
 
         <FormField label="Customs Reference" error={errors.customsRef?.message} required>
-          <input className={inputCls(errors.customsRef)} placeholder="Customs ref number" {...register("customsRef")} />
+          <input
+            className={inputCls(errors.customsRef)}
+            placeholder="e.g. CUS-2024-001"
+            {...register("customsRef")}
+          />
         </FormField>
 
         <FormField label="Proof of Ownership" error={errors.proofOfOwnership?.message} required>
-          <input className={inputCls(errors.proofOfOwnership)} placeholder="Document reference" {...register("proofOfOwnership")} />
+          <input
+            className={inputCls(errors.proofOfOwnership)}
+            placeholder="e.g. DOC-2024-001"
+            {...register("proofOfOwnership")}
+          />
         </FormField>
 
         <FormField label="Roadworthy Certificate" error={errors.roadworthyCert?.message} required>
-          <input className={inputCls(errors.roadworthyCert)} placeholder="Certificate number" {...register("roadworthyCert")} />
+          <input
+            className={inputCls(errors.roadworthyCert)}
+            placeholder="e.g. RWC-2024-001"
+            {...register("roadworthyCert")}
+          />
         </FormField>
 
         <FormField label="State" error={errors.state?.message} required>
-          <input className={inputCls(errors.state)} placeholder="e.g. Kigali" {...register("state")} />
+          <input
+            className={inputCls(errors.state)}
+            placeholder="e.g. Kigali"
+            {...register("state")}
+          />
         </FormField>
+
       </div>
 
       <SectionTitle>Insurance Details</SectionTitle>
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5">
+
         <FormField label="Policy Number" error={errors.policyNumber?.message} required>
-          <input className={inputCls(errors.policyNumber)} placeholder="Policy number" {...register("policyNumber")} />
+          <input
+            className={inputCls(errors.policyNumber)}
+            placeholder="e.g. POL-2024-001"
+            {...register("policyNumber")}
+          />
         </FormField>
 
-        <FormField label="Insurance Company" error={errors.companyName?.message} required>
-          <input className={inputCls(errors.companyName)} placeholder="e.g. SORAS" {...register("companyName")} />
+        <FormField label="Insurance Company (Insurer)" error={errors.companyName?.message} required>
+          <input
+            className={inputCls(errors.companyName)}
+            placeholder="e.g. SORAS, RADIANT, SONARWA"
+            {...register("companyName")}
+          />
         </FormField>
 
         <FormField label="Insurance Type" error={errors.insuranceType?.message} required>
-          <input className={inputCls(errors.insuranceType)} placeholder="e.g. Comprehensive" {...register("insuranceType")} />
+          <input
+            className={inputCls(errors.insuranceType)}
+            placeholder="e.g. Comprehensive"
+            {...register("insuranceType")}
+          />
         </FormField>
 
-        <FormField label="Insurance Expiry Date" error={errors.insuranceExpiryDate?.message} required>
-          <input type="datetime-local" className={inputCls(errors.insuranceExpiryDate)} {...register("insuranceExpiryDate")} />
+        <FormField label="Insurance Expiry Date (must be future)" error={errors.insuranceExpiryDate?.message} required>
+          <input
+            type="datetime-local"
+            className={inputCls(errors.insuranceExpiryDate)}
+            {...register("insuranceExpiryDate")}
+          />
         </FormField>
 
         <FormField label="Insurance Status" error={errors.insuranceStatus?.message} required>
@@ -100,6 +147,7 @@ export default function Step3RegInsurance() {
             {INSURANCE_STATUSES.map(s => <option key={s} value={s}>{s}</option>)}
           </select>
         </FormField>
+
       </div>
     </div>
   );

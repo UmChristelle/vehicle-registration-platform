@@ -35,29 +35,29 @@ export default function EditVehiclePage() {
         engineCapacity:   v.engineCapacity,
         seatingCapacity:  v.seatingCapacity,
         odometerReading:  v.odometerReading ?? 0,
-        purpose:          v.vehiclePurpose ?? "", // map back from API
-        status:           v.vehicleStatus  ?? "", // map back from API
+        purpose:          v.vehiclePurpose ?? "",
+        status:           v.vehicleStatus  ?? "",
         ownerName:        v.ownerName ?? "",
         ownerType:        v.ownerType ?? "",
         nationalId:       v.nationalId ?? "",
-        mobileNumber:     v.mobile ?? "",          // map back from API
+        mobileNumber:     v.mobile ?? "",
         email:            v.email ?? "",
         address:          v.address ?? "",
         companyRegNumber: v.companyRegNumber ?? "",
         passportNumber:   v.passportNumber ?? "",
         plateNumber:      v.plateNumber ?? "",
         plateType:        v.plateType ?? "",
-        registrationDate: v.registrationDate?.slice(0,16) ?? "",
-        expiryDate:       v.expiryDate?.slice(0,16) ?? "",
+        registrationDate: v.registrationDate?.slice(0, 16) ?? "",
+        expiryDate:       v.expiryDate?.slice(0, 16) ?? "",
         registrationStatus: v.registrationStatus ?? "",
         customsRef:       v.customsRef ?? "",
         proofOfOwnership: v.proofOfOwnership ?? "",
         roadworthyCert:   v.roadworthyCert ?? "",
         state:            v.state ?? "",
         policyNumber:     v.policyNumber ?? "",
-        companyName:      v.insuranceCompany ?? "", // map back from API
+        companyName:      v.companyName ?? "",
         insuranceType:    v.insuranceType ?? "",
-        insuranceExpiryDate: v.insuranceExpiryDate?.slice(0,16) ?? "",
+        insuranceExpiryDate: v.insuranceExpiryDate?.slice(0, 16) ?? "",
         insuranceStatus:  v.insuranceStatus ?? "",
       });
     }
@@ -80,26 +80,27 @@ export default function EditVehiclePage() {
       ownerName:       formData.ownerName.trim(),
       ownerType:       formData.ownerType,
       nationalId:      formData.nationalId.trim(),
-      passportNumber:  formData.passportNumber?.trim() || "",
-      companyRegNumber:formData.companyRegNumber?.trim() || "",
       address:         formData.address.trim(),
       mobile:          formData.mobileNumber.trim(),
       email:           formData.email.trim(),
-      plateNumber:     formData.plateNumber.trim(),
-      plateType:       formData.plateType,
+      ...(formData.passportNumber?.trim()   && { passportNumber:   formData.passportNumber.trim()   }),
+      ...(formData.companyRegNumber?.trim() && { companyRegNumber: formData.companyRegNumber.trim() }),
+      plateNumber:        formData.plateNumber.trim(),
+      plateType:          formData.plateType,
       registrationStatus: formData.registrationStatus,
       registrationDate:   new Date(formData.registrationDate).toISOString(),
       expiryDate:         new Date(formData.expiryDate).toISOString(),
-      state:           formData.state.trim(),
-      customsRef:      formData.customsRef.trim(),
-      roadworthyCert:  formData.roadworthyCert.trim(),
-      proofOfOwnership:formData.proofOfOwnership.trim(),
-      policyNumber:    formData.policyNumber.trim(),
-      insuranceCompany:formData.companyName.trim(),
-      insuranceType:   formData.insuranceType.trim(),
-      insuranceStatus: formData.insuranceStatus,
+      state:              formData.state.trim(),
+      customsRef:         formData.customsRef.trim(),
+      roadworthyCert:     formData.roadworthyCert.trim(),
+      proofOfOwnership:   formData.proofOfOwnership.trim(),
+      policyNumber:       formData.policyNumber.trim(),
+      companyName:        formData.companyName.trim(),
+      insuranceType:      formData.insuranceType.trim(),
+      insuranceStatus:    formData.insuranceStatus,
       insuranceExpiryDate: new Date(formData.insuranceExpiryDate).toISOString(),
     };
+
     try {
       await updateMutation.mutateAsync(payload);
       navigate(`/vehicle/${id}`);
@@ -110,7 +111,8 @@ export default function EditVehiclePage() {
     return (
       <div className="p-8 flex items-center justify-center">
         <div className="flex flex-col items-center gap-3 py-16 text-slate-500">
-          <div className="spinner"/><p className="text-sm">Loading vehicle data…</p>
+          <div className="spinner"/>
+          <p className="text-sm">Loading vehicle data…</p>
         </div>
       </div>
     );
