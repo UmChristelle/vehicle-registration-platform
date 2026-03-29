@@ -66,11 +66,11 @@ export default function RegisterVehiclePage() {
       ownerName:           data.ownerName.trim(),
       ownerType:           data.ownerType,
       nationalId:          data.nationalId.trim(),
+      passportNumber:      data.passportNumber?.trim() || "NONE",
+      companyRegNumber:    data.companyRegNumber?.trim() || "NONE",
       address:             data.address.trim(),
       mobile:              data.mobileNumber.trim(),
       email:               data.email.trim(),
-      ...(data.passportNumber?.trim()   && { passportNumber:   data.passportNumber.trim()   }),
-      ...(data.companyRegNumber?.trim() && { companyRegNumber: data.companyRegNumber.trim() }),
       plateNumber:         data.plateNumber.trim(),
       plateType:           data.plateType,
       registrationStatus:  data.registrationStatus,
@@ -90,7 +90,9 @@ export default function RegisterVehiclePage() {
     try {
       await createMutation.mutateAsync(payload);
       setSubmitted(true);
-    } catch {}
+    } catch (error) {
+      console.error("Error response:", error?.response?.data);
+    }
   };
 
   if (submitted) {
@@ -151,7 +153,6 @@ export default function RegisterVehiclePage() {
           <div className="bg-[#181c26] border border-[#2a3045] rounded-2xl p-6 md:p-8">
             <StepComponent/>
             {step === 2 && <ErrorList error={createMutation.error}/>}
-
             <div className="flex items-center mt-8 pt-6 border-t border-[#2a3045]">
               {step > 0 && (
                 <button type="button" onClick={() => setStep(s => s - 1)}
